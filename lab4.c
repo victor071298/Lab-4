@@ -7,61 +7,57 @@
 // Variaveis globais
 int x = 0;    //Variável correspondente a primeira condição
 int y = 0;    //Variável correspondente a segunda condição
-pthread_mutex_t mutex_x , mutex_y;  
+pthread_mutex_t mutex;  
 pthread_cond_t cond1 , cond2;
 
 // Thread 1 
 void *a () {
-    pthread_mutex_lock(&mutex_x);
+    pthread_mutex_lock(&mutex);
     if(x==0){
-        pthread_cond_wait(&cond1, &mutex_x);
+        pthread_cond_wait(&cond1, &mutex);
     }
     printf("Fique a vontade.\n");
-    pthread_mutex_unlock(&mutex_x);
-    pthread_mutex_lock(&mutex_y);
     y++;
     if(y==2){
         pthread_cond_signal(&cond2);
     }
-    pthread_mutex_unlock(&mutex_y);
+    pthread_mutex_unlock(&mutex);
     pthread_exit(NULL);
 }
 
 // Thread 2
 void *b () {
     printf("Seja bem-vindo!\n");
-    pthread_mutex_lock(&mutex_x);
+    pthread_mutex_lock(&mutex);
     x++;
     pthread_cond_broadcast(&cond1);
-    pthread_mutex_unlock(&mutex_x);
+    pthread_mutex_unlock(&mutex);
     pthread_exit(NULL);
 }
 
 // Thread 3
 void *c (){
-    pthread_mutex_lock(&mutex_y);
+    pthread_mutex_lock(&mutex);
     if(y<2){
-        pthread_cond_wait(&cond2,&mutex_y);
+        pthread_cond_wait(&cond2,&mutex);
     }
     printf("Volte sempre!\n");
-    pthread_mutex_unlock(&mutex_y);
+    pthread_mutex_unlock(&mutex);
     pthread_exit(NULL);
 }
 
 // Thread 4
 void *d (){
-    pthread_mutex_lock(&mutex_x);
+    pthread_mutex_lock(&mutex);
     if(x==0){
-        pthread_cond_wait(&cond1, &mutex_x);
+        pthread_cond_wait(&cond1, &mutex);
     }
     printf("Sente-se por favor.\n");
-    pthread_mutex_unlock(&mutex_x);
-    pthread_mutex_lock(&mutex_y);
     y++;
     if(y==2){
         pthread_cond_signal(&cond2);
     }
-    pthread_mutex_unlock(&mutex_y);
+    pthread_mutex_unlock(&mutex);
     pthread_exit(NULL);
 }
 
@@ -70,8 +66,7 @@ int main() {
   pthread_t threads[NTHREADS];
 
   // Inicializando os mutex e as condições que serão utilizados
-  pthread_mutex_init(&mutex_x, NULL);
-  pthread_mutex_init(&mutex_y, NULL);
+  pthread_mutex_init(&mutex, NULL);
   pthread_cond_init (&cond1, NULL);
   pthread_cond_init (&cond2, NULL);
 
@@ -87,8 +82,7 @@ int main() {
   }
 
   // Desalocando variáveis e encerrando o programa
-  pthread_mutex_destroy(&mutex_y);
-  pthread_mutex_destroy(&mutex_y);
+  pthread_mutex_destroy(&mutex);
   pthread_cond_destroy(&cond1);
   pthread_cond_destroy(&cond2);
   return 0;
